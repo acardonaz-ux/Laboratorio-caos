@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="Herradura de Smale: construcción, iteraciones geométricas animadas, bandas e itinerarios." />
+<title>Laboratorio de la herradura de Smale · Dinámica simbólica</title>
+<style>
+:root{--ink:#15283a;--secondary:#577084;--teal:#148d91;--deep:#08747e;--blue:#256cbe;--coral:#d86d42;--gold:#c38d28;--bg:#f2f6f8;--white:#fff;--line:#dce6eb;--soft:#eaf2f6;--shadow:0 12px 36px rgba(15,38,58,.085);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-size:14px}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #72cacf;outline-offset:2px}button:disabled{opacity:.45;cursor:not-allowed}
+header{min-height:77px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px clamp(18px,3vw,50px)}.brand small{display:block;letter-spacing:.13em;text-transform:uppercase;color:var(--teal);font-weight:750;font-size:10px;margin-bottom:5px}.brand h1{margin:0;font-size:clamp(20px,2vw,27px);letter-spacing:-.04em;font-weight:800}.head-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.pill{border:1px solid #b8dadd;background:#e9f8f7;color:#0c6c75;font-weight:700;padding:7px 11px;border-radius:50px;font-size:11px}.shell{max-width:1800px;margin:0 auto;padding:20px clamp(15px,2.2vw,34px) 35px}
+.tabbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:17px}.tab{border:1px solid transparent;background:transparent;color:#526d81;border-radius:10px;padding:11px 17px;font-size:13px;font-weight:700}.tab.active{background:#fff;color:#087a80;border-color:#d3e5e8;box-shadow:0 2px 9px rgba(0,0,0,.03)}.tab .number{font-weight:850;color:#83a2b2;margin-right:7px}.tab.active .number{color:#0d8b90}
+.layout{display:grid;grid-template-columns:minmax(235px,290px) minmax(460px,1fr) minmax(235px,292px);gap:16px;align-items:stretch}.panel{background:var(--white);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}.controls{padding:20px;display:flex;flex-direction:column;gap:21px}.block-title{margin:0 0 13px;font-size:11px;letter-spacing:.12em;color:#698192;text-transform:uppercase;font-weight:850}.control{margin:14px 0}.ctrl-line{display:flex;justify-content:space-between;gap:8px;margin-bottom:9px;align-items:baseline}.ctrl-line label{color:#344b5d;font-weight:630}.value{font-weight:800;color:var(--deep);font-variant-numeric:tabular-nums}.range{width:100%;accent-color:var(--teal);cursor:pointer}.hint{font-size:11px;line-height:1.5;color:#8295a2}.two-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{border:1px solid #d3e3e9;background:white;border-radius:10px;padding:11px 13px;color:#35546c;font-weight:740;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:41px}.btn.primary{background:#0b8990;color:white;border-color:#0b8990}.btn.accent{background:#edf7f7;color:#08727a;border-color:#cce6e6}.btn:hover:not(:disabled){filter:brightness(.965)}.btn.wide{width:100%}.control-sep{height:1px;background:var(--line)}.toggleline{display:flex;gap:9px;align-items:center;font-size:13px;color:#455d6c;margin:10px 0}.toggleline input{accent-color:#158d91}.metric-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #edf2f5}.metric-row:last-child{border:none}.metric-row span{color:#6d8594}.metric-row strong{font-variant-numeric:tabular-nums}
+.viz{overflow:hidden;display:flex;flex-direction:column}.viz-heading{padding:19px 22px 11px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.viz-heading h2{font-size:20px;letter-spacing:-.035em;margin:0 0 5px}.viz-heading p{font-size:12px;color:#728997;line-height:1.5;margin:0}.stepbadge{padding:8px 11px;border-radius:999px;background:#edf7f7;color:#08777d;white-space:nowrap;font-size:11px;font-weight:800}.visual{position:relative;flex:1;min-height:450px;background:radial-gradient(ellipse at 48% 50%,#fff,#f8fbfc 65%,#f3f8fa);margin:5px 16px 7px;border-radius:13px;border:1px solid #e4edf1;overflow:hidden}canvas{display:block;position:absolute;inset:0;width:100%;height:100%}.floating-hint{position:absolute;right:12px;top:12px;background:rgba(255,255,255,.93);border:1px solid #e3ecef;box-shadow:0 2px 12px rgba(16,46,59,.05);padding:8px 10px;border-radius:8px;color:#62818e;font-size:11px;pointer-events:none}.timeline{padding:10px 20px 15px;border-top:1px solid #ecf1f4}.timeline .r{display:flex;align-items:center;gap:12px}.timeline input{flex:1}.timeline-label{min-width:75px;text-align:right;font-size:11px;color:#728897;font-variant-numeric:tabular-nums}.figlegend{display:flex;justify-content:center;flex-wrap:wrap;gap:16px;font-size:11px;color:#617788;padding:0 14px 12px}.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}.explainer{padding:23px 19px;display:flex;flex-direction:column;gap:18px}.concept-index{font-size:11px;color:#158b92;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.explainer h3{font-size:22px;letter-spacing:-.04em;line-height:1.2;margin:8px 0 10px}.explainer p{color:#5e7889;line-height:1.65;margin:0}.callout{background:#f2f9f9;border:1px solid #dceeed;border-radius:12px;padding:15px}.callout strong{display:block;margin-bottom:7px;color:#116e73}.math{font-family:Georgia,"Times New Roman",serif;font-size:19px;letter-spacing:.01em}.formula{padding:13px;text-align:center;background:#f5f8fa;border:1px solid #e4edf0;border-radius:10px;font-size:17px;color:#22475b}.footerline{margin-top:auto;border-top:1px solid var(--line);padding-top:15px;color:#77909c;font-size:11px;line-height:1.6}.tiny-stage{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:13px 20px 17px}.tiny-stage span{text-align:center;font-size:10px;color:#8093a0;padding:6px 2px;border-top:3px solid #e0e9ed}.tiny-stage span.now{color:#087a80;border-top-color:#0b8990;font-weight:850}.word{display:inline-block;letter-spacing:.18em;font-size:20px;font-weight:800;background:#edf5f7;padding:9px 12px;border-radius:8px;color:#0c7281;font-family:ui-monospace,monospace}.example-picker{width:100%;padding:11px;border-radius:10px;border:1px solid #cadfe6;background:#fff;color:#1e4558}.no-display{display:none!important}.notice{margin-top:17px;font-size:11px;color:#8193a2;line-height:1.5;padding:0 6px}.kbd{font-size:10px;background:#e9f0f4;padding:3px 5px;border-radius:4px;color:#637e8d;font-weight:700}.coordinates{font-variant-numeric:tabular-nums;font-family:ui-monospace,monospace;font-size:12px!important}
+body.presentation header,body.presentation .tabbar,body.presentation .notice{display:none}body.presentation .shell{padding:10px;max-width:100%;height:100vh}body.presentation .layout{height:calc(100vh - 20px)}body.presentation .panel{box-shadow:none}body.presentation .visual{min-height:200px}
+@media(max-width:1100px){.layout{grid-template-columns:240px minmax(0,1fr)}.explainer{grid-column:1/-1}.visual{min-height:420px}}@media(max-width:690px){header{align-items:flex-start;flex-direction:column}.layout{grid-template-columns:minmax(0,1fr)}.controls{gap:10px}.visual{min-height:390px}.viz-heading h2{font-size:18px}.explainer{grid-column:auto}.tab{padding:9px 10px;font-size:12px}.floating-hint{display:none}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Modo de iteración geométrica, horizontal y preparado para proyección. */
+#iterateControls .control {margin:12px 0}
+#iterateControls .section-note {color:#6e8595;font-size:12px;line-height:1.55;margin:11px 0}
+#iterateControls .big-counter {font-variant-numeric:tabular-nums;color:#087a80;font-weight:800;font-size:20px}
+.iteration-progress {display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:11px 0}
+.iteration-progress span {padding:9px 4px;text-align:center;background:#f0f6f8;border-radius:9px;color:#718a99;font-size:11px;font-weight:700}
+.iteration-progress span.on {background:#d9f2ed;color:#086e71;border:1px solid #a8dcd4}
+#iterTimeline {padding:9px 22px 15px;border-top:1px solid #ecf1f4}
+#iterTimeline .r {display:flex;gap:9px;align-items:center}
+#iterTimeline input {flex:1}
+#iterTimeline label {font-size:11px;color:#718797}
+#iterTimeline output {font-size:11px;color:#087a80;min-width:46px;text-align:right;font-weight:750}
+@media(max-width:1450px){body:not(.presentation) .layout{grid-template-columns:minmax(215px,260px) minmax(390px,1fr) minmax(210px,260px)}}
+@media(max-width:1120px){body:not(.presentation) .layout{grid-template-columns:minmax(220px,270px) minmax(380px,1fr)}body:not(.presentation) .explainer{grid-column:1/-1}}
+@media(max-width:750px){body:not(.presentation) .layout{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><small>Laboratorio matemático · Dinámica simbólica</small><h1>La herradura de Smale</h1></div>
+  <div class="head-right"><span class="pill">Modelo geométrico idealizado</span><button class="btn" id="presentBtn" title="Pantalla completa (tecla F)">⛶ &nbsp;Presentar</button></div>
+</header>
+<main class="shell">
+<nav class="tabbar" aria-label="Secciones de la simulación">
+ <button class="tab active" data-mode="geometry"><span class="number">01</span> Construcción geométrica</button>
+ <button class="tab" data-mode="iterate"><span class="number">02</span> Iterar la herradura</button>
+ <button class="tab" data-mode="bands"><span class="number">03</span> Iteraciones y bandas</button>
+ <button class="tab" data-mode="orbits"><span class="number">04</span> Órbitas y símbolos</button>
+</nav>
+<div class="layout">
+  <aside class="panel controls">
+    <section id="geometryControls">
+      <h3 class="block-title">Deformar el cuadrado</h3>
+      <button class="btn primary wide" id="playGeom">▶ &nbsp;Reproducir construcción</button>
+      <div class="two-buttons" style="margin-top:9px"><button class="btn" id="prevStage">← Anterior</button><button class="btn" id="nextStage">Siguiente →</button></div>
+      <div class="control-sep" style="margin:18px 0"></div>
+      <h3 class="block-title">Parámetros geométricos</h3>
+      <div class="control"><div class="ctrl-line"><label for="widthSlider">Compresión transversal</label><output class="value" id="widthVal">0,16</output></div><input class="range" type="range" min="0.10" max="0.23" step="0.01" value="0.16" id="widthSlider"><div class="hint">Anchura de la franja final respecto a Q.</div></div>
+      <div class="control"><div class="ctrl-line"><label for="heightSlider">Altura del pliegue</label><output class="value" id="heightVal">1,15</output></div><input class="range" type="range" min="1.08" max="1.40" step="0.01" value="1.15" id="heightSlider"><div class="hint">La parte curva queda por encima del cuadrado.</div></div>
+      <div class="control-sep" style="margin:15px 0"></div>
+      <label class="toggleline"><input type="checkbox" id="gridToggle" checked> Mostrar la cuadrícula deformada</label>
+      <label class="toggleline"><input type="checkbox" id="qToggle" checked> Mostrar el cuadrado Q</label>
+    </section>
+    <section id="iterateControls" class="no-display">
+      <h3 class="block-title">Aplicar h a la figura actual</h3>
+      <button class="btn primary wide" id="iterPlay">▶ &nbsp;Reproducir las iteraciones</button>
+      <div class="two-buttons" style="margin-top:8px">
+        <button class="btn" id="iterOnce">↪ Una iteración</button>
+        <button class="btn" id="iterReset">↺ Reiniciar</button>
+      </div>
+      <div class="control-sep" style="margin:18px 0"></div>
+      <div class="ctrl-line"><label for="iterN">Imagen de partida</label><output id="iterRoundLabel" class="big-counter">D</output></div>
+      <input id="iterN" class="range" type="range" min="0" max="5" step="1" value="0" aria-label="Iteraciones ya completadas">
+      <div class="hint">Elige D, h(D), h²(D), …, h⁵(D). Al reproducir, la siguiente deformación parte de esa misma figura.</div>
+      <div class="control"><div class="ctrl-line"><label for="iterMax">Iteraciones máximas</label><output id="iterMaxVal" class="value">5</output></div>
+      <input id="iterMax" class="range" type="range" min="1" max="5" step="1" value="5"></div>
+      <div class="control-sep" style="margin:12px 0"></div>
+      <h3 class="block-title">Vista y trazos</h3>
+      <label class="hint" for="iterView">Encuadre</label>
+      <select class="example-picker" id="iterView" style="margin-top:7px">
+        <option value="full" selected>Imagen completa (autoencuadre)</option>
+        <option value="focus">Ampliación alrededor de Q</option>
+      </select>
+      <label class="toggleline"><input type="checkbox" id="iterGhost" checked> Mostrar la imagen anterior</label>
+      <label class="toggleline"><input type="checkbox" id="iterMesh" checked> Mostrar cuadrícula deformada</label>
+      <div class="iteration-progress"><span id="iterPhase0" class="on">Figura inicial</span><span id="iterPhase1">Estirar y contraer</span><span id="iterPhase2">Doblar</span></div>
+      <p class="section-note">Aquí se anima geométricamente la imagen de toda la región. La pestaña siguiente estudia otro conjunto: los puntos que permanecen en Q.</p>
+    </section>
+    <section id="bandsControls" class="no-display">
+      <h3 class="block-title">Supervivencia bajo iteración</h3>
+      <div class="control"><div class="ctrl-line"><label for="nSlider">Número de iteraciones</label><output id="nVal" class="value">n = 1</output></div><input class="range" type="range" min="1" max="8" step="1" value="1" id="nSlider"><div class="hint">Cada nivel conserva 2<sup>n</sup> franjas de retorno. Para exponer, n = 5 suele ser ideal.</div></div>
+      <div class="two-buttons"><button class="btn" id="lessN">− Una</button><button class="btn primary" id="moreN">+ Una</button></div>
+      <div class="control-sep" style="margin:20px 0"></div>
+      <label class="toggleline"><input type="checkbox" id="wordsToggle" checked> Mostrar palabras binarias</label>
+      <label class="toggleline"><input type="checkbox" id="bandGuide" checked> Mostrar bandas del primer paso</label>
+      <div class="control-sep" style="margin:16px 0"></div>
+      <h3 class="block-title">Mismos parámetros</h3>
+      <div class="metric-row"><span>Anchura transversal</span><strong id="bandsWidth">0,16</strong></div>
+      <div class="metric-row"><span>Expansión longitudinal</span><strong id="bandsStretch">3,69</strong></div>
+      <p class="hint">Puedes cambiar los parámetros en la pestaña de construcción.</p>
+    </section>
+    <section id="orbitsControls" class="no-display">
+      <h3 class="block-title">Elegir un itinerario periódico</h3>
+      <label class="hint" for="orbitSelect">Repetiremos indefinidamente una palabra de ceros y unos.</label>
+      <select class="example-picker" id="orbitSelect" style="margin-top:11px">
+       <option value="0">0 — Punto fijo</option><option value="1">1 — Punto fijo</option>
+       <option value="01" selected>01 — Órbita de período 2</option>
+       <option value="001">001 — Órbita de período 3</option>
+       <option value="011">011 — Órbita de período 3</option>
+       <option value="0011">0011 — Órbita de período 4</option>
+       <option value="0001">0001 — Órbita de período 4</option>
+      </select>
+      <div style="margin:20px 0 10px"><button class="btn primary wide" id="playOrbit">▶ &nbsp;Reproducir órbita</button></div>
+      <div class="two-buttons"><button class="btn" id="resetOrbit">↺ Reiniciar</button><button class="btn" id="stepOrbit">Paso +1 →</button></div>
+      <div class="control-sep" style="margin:20px 0"></div>
+      <h3 class="block-title">Qué estás observando</h3>
+      <p style="line-height:1.6;color:#66808e;font-size:12px">Cada punto permanece en Q. Su siguiente posición está en una de las dos regiones de retorno; esa elección determina el siguiente símbolo.</p>
+    </section>
+    <div class="footerline" id="sidebarFoot">El cuadrado se transforma en una franja larga, delgada y plegada. La vista está orientada horizontalmente para facilitar la proyección en diapositivas.</div>
+  </aside>
+  <section class="panel viz">
+    <div class="viz-heading"><div><h2 id="vizTitle">Del cuadrado a la herradura</h2><p id="vizSubtitle">Una transformación continua, mostrada paso a paso.</p></div><span class="stepbadge" id="phaseBadge">ETAPA 1 / 4</span></div>
+    <div class="visual"><canvas id="canvas" aria-label="Visualización matemática interactiva"></canvas><div class="floating-hint" id="canvasHint">Q = [0,1] × [0,1]</div></div>
+    <div class="timeline" id="geomTimeline"><div class="r"><button class="btn" id="rewindBtn" title="Volver al cuadrado">↺</button><input aria-label="Avance de la deformación" id="stageSlider" class="range" type="range" min="0" max="300" step="1" value="0" /><span class="timeline-label" id="stagePercent">0 %</span></div></div>
+    <div class="timeline no-display" id="iterTimeline"><div class="r">
+      <label for="iterScrub">Deformación</label>
+      <input aria-label="Progreso de la iteración actual" type="range" id="iterScrub" class="range" min="0" max="100" step="1" value="0">
+      <output id="iterScrubVal">0 %</output>
+    </div></div>
+    <div class="tiny-stage" id="stageScale"><span class="now">Cuadrado</span><span>Estirar</span><span>Doblar</span><span>Intersecar</span></div>
+    <div class="figlegend" id="legend"><span><i class="dot" style="background:#148d91"></i>Imagen deformada F(Q)</span><span><i class="dot" style="background:#f7c76b;border:1px solid #a47d27"></i>Cuadrado original Q</span></div>
+  </section>
+  <aside class="panel explainer">
+    <section><div class="concept-index" id="conceptIndex">OBSERVA · 01</div><h3 id="explainTitle">Empezamos con un cuadrado.</h3><p id="explainBody">No hay azar. Cada punto del cuadrado tiene una imagen determinada por la transformación.</p></section>
+    <div class="callout"><strong id="keyTitle">La pregunta</strong><p id="keyText">¿Qué ocurre si estiramos, comprimimos y después doblamos el cuadrado?</p></div>
+    <div class="formula math" id="formula">Q = [0,1]²</div>
+    <section><h3 class="block-title">Lectura matemática</h3><p id="mathText">La herradura permite estudiar una dinámica complicada mediante una geometría sencilla.</p></section>
+    <div class="footerline" id="rightFoot">Nota: la construcción representa un modelo local de la herradura clásica, rotado 90° respecto a la orientación habitual de estiramiento horizontal. No es todavía la aplicación global en todo el plano ni el automorfismo cociente estudiado en la tesis.</div>
+  </aside>
+</div>
+<p class="notice">Controles: <span class="kbd">←</span>/<span class="kbd">→</span> para avanzar en la construcción o las iteraciones; <span class="kbd">Espacio</span> para reproducir/pausar; <span class="kbd">F</span> para pantalla completa. Aplicación local sin bibliotecas externas ni conexión a internet. En «Iterar la herradura» se usa una extensión geométrica fuera de Q para visualizar toda la imagen.</p>
+</main>
+<script>
+'use strict';
+(() => {
+ const $=id=>document.getElementById(id);
+ const canvas=$('canvas'),ctx=canvas.getContext('2d');
+ const state={mode:'geometry',stage:0,width:.16,top:1.15,bottom:-.30,n:1,grid:true,showQ:true,words:true,guides:true,horizontal:true,iterRound:0,iterT:0,iterMax:5,iterPlaying:false,iterOne:false,iterTime:0,iterView:'full',iterGhost:true,iterMesh:true,iterCache:null,playingGeom:false,geomStart:0,selected:'0',word:'01',orbitStep:0,orbitPlay:false,orbitLast:0,periodicPoints:[],needsDraw:true};
+ const TWO=Math.PI*2, clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),ease=t=>{t=clamp(t,0,1);return t*t*(3-2*t)},fmt=(x,d=2)=>x.toFixed(d).replace('.',',');
+ let cssW=1000,cssH=600,dpr=1,cam;
+ function length(){return 2*(state.top-state.bottom)+Math.PI*.25}
+ function curve(y,a){
+   const R=.25,leg=state.top-state.bottom,L=length(),s=y*L,arc=Math.PI*R;
+   if(s<=leg)return {x:.25,y:state.bottom+s,theta:0};
+   if(s<=leg+arc){const z=s-leg;if(a<1e-9)return {x:.25,y:state.top+z,theta:0};const t=a*z/R;return {x:.25+R/a*(1-Math.cos(t)),y:state.top+R/a*Math.sin(t),theta:t}}
+   const z=s-leg-arc;
+   if(a<1e-9)return {x:.25,y:state.top+arc+z,theta:0};
+   return {x:.25+R/a*(1-Math.cos(a*Math.PI))+z*Math.sin(a*Math.PI),y:state.top+R/a*Math.sin(a*Math.PI)+z*Math.cos(a*Math.PI),theta:a*Math.PI};
+ }
+ function F(x,y,a=1){const c=curve(y,a),r=state.width*(x-.5);return {x:c.x+r*Math.cos(c.theta),y:c.y-r*Math.sin(c.theta)}}
+ function transformed(x,y,t){if(t<=1){let k=ease(t),f=F(x,y,0);return {x:x+(f.x-x)*k,y:y+(f.y-y)*k}}return F(x,y,ease(t-1))}
+ function viewCoords(x,y){if(!state.horizontal)return {x,y};return {x:.5+(y-.5),y:.5-(x-.5)}}
+ function projection(x,y){const p=viewCoords(x,y),c=viewCoords(cam.x,cam.y);return {x:cssW/2+(p.x-c.x)*cam.s,y:cssH/2-(p.y-c.y)*cam.s}}
+ function setCamera(x,y,height){cam={x,y,s:Math.min(cssH/height,cssW/(height*.92))}}
+ function cameraGeom(){const t=state.stage,k=t<=1?ease(t):1,k2=t<=1?0:ease(t-1);const cs={x:.5,y:.5,h:1.55},ce={x:.5,y:1.45,h:4.55},cf={x:.5,y:.55,h:2.10};let cc={};for(let v of ['x','y','h'])cc[v]=cs[v]+(ce[v]-cs[v])*k+(cf[v]-ce[v])*k2;setCamera(cc.x,cc.y,cc.h)}
+ function cameraStatic(){setCamera(.5,.5,1.44)}
+ function pathPolygon(points){if(!points.length)return;ctx.beginPath();let p=projection(points[0].x,points[0].y);ctx.moveTo(p.x,p.y);for(let i=1;i<points.length;i++){p=projection(points[i].x,points[i].y);ctx.lineTo(p.x,p.y)}ctx.closePath()}
+ function lineWorld(points,stroke='#286c72',width=1.2,dashes=[]){if(!points.length)return;ctx.beginPath();let p=projection(points[0].x,points[0].y);ctx.moveTo(p.x,p.y);for(let i=1;i<points.length;i++){p=projection(points[i].x,points[i].y);ctx.lineTo(p.x,p.y)}ctx.setLineDash(dashes);ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke();ctx.setLineDash([])}
+ function rectWorld(x0,y0,x1,y1,fill,stroke=null,lineWidth=1){let ps=[{x:x0,y:y0},{x:x1,y:y0},{x:x1,y:y1},{x:x0,y:y1}];pathPolygon(ps);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lineWidth;ctx.stroke()}}
+ function label(text,x,y,fill='#43677a',font='600 13px system-ui',align='center'){const p=projection(x,y);ctx.fillStyle=fill;ctx.font=font;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(text,p.x,p.y)}
+ function baseGrid(){ctx.fillStyle='#f9fcfd';ctx.fillRect(0,0,cssW,cssH);ctx.lineWidth=1;ctx.strokeStyle='#edf3f6';ctx.beginPath();for(let j=-3;j<=4;j+=.25){const a=projection(-3,j),b=projection(4,j);ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y)}for(let j=-3;j<=4;j+=.25){const a=projection(j,-3),b=projection(j,5);ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y)}ctx.stroke()}
+ function drawQ(light=true){if(!state.showQ)return;rectWorld(0,0,1,1,light?'rgba(246,195,94,.095)':null,'#bd9739',2.2);label('Q',-.085,1.055,'#9d782f','800 14px system-ui')}
+ function drawMesh(stage){const pts=[],rows=140;for(let j=0;j<=rows;j++){const y=j/rows;pts.push(transformed(0,y,stage))}for(let j=rows;j>=0;j--){const y=j/rows;pts.push(transformed(1,y,stage))}pathPolygon(pts);ctx.fillStyle='rgba(33,159,162,.21)';ctx.fill();ctx.strokeStyle='#087c87';ctx.lineWidth=3;ctx.stroke();
+ if(state.grid){for(let ix=1;ix<=7;ix++){let p=[];for(let k=0;k<=rows;k++)p.push(transformed(ix/8,k/rows,stage));lineWorld(p,'rgba(5,111,125,.45)',1)}for(let jy=1;jy<=13;jy++){let p=[];for(let k=0;k<=20;k++)p.push(transformed(k/20,jy/14,stage));lineWorld(p,'rgba(6,111,125,.55)',1)}}
+ const cornerNames=[['A',0,0],['B',1,0],['C',1,1],['D',0,1]];for(let [name,x,y] of cornerNames){let p=transformed(x,y,stage);let q=projection(p.x,p.y);ctx.fillStyle='#0f7580';ctx.beginPath();ctx.arc(q.x,q.y,3.5,0,TWO);ctx.fill();ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillStyle='#1c5f6b';ctx.fillText(name,q.x+(x===0?-12:12),q.y+(y===0?14:-9))}}
+ function drawBandsOverlay(){ctx.save();const a=.25-state.width/2,b=.25+state.width/2,c=.75-state.width/2,d=.75+state.width/2;rectWorld(a,0,b,1,'rgba(40,110,195,.35)');rectWorld(c,0,d,1,'rgba(232,122,76,.35)');rectWorld(0,0,1,1,null,'#ab893e',1.9);label('0',.25,.5,'#15467d','900 23px system-ui');label('1',.75,.5,'#954424','900 23px system-ui');ctx.restore()}
+ function drawGeometry(){cameraGeom();baseGrid();drawQ(true);drawMesh(Math.min(2,state.stage));if(state.stage>2.01){ctx.save();ctx.globalAlpha=ease(state.stage-2);drawBandsOverlay();ctx.restore()}}
+
+ // --- h^n(D) SOBRE LA FIGURA MISMA --------------------------------------
+ // La regla F original es exacta en Q, pero F(Q) sale parcialmente de Q.
+ // Para poder iterar toda la figura se escoge una EXTENSIÓN VISUAL explícita
+ // fuera de Q; una compresión monótona de las coordenadas alejadas mantiene
+ // el dibujo en una ventana manejable, sin alterar la regla local en Q.
+ function compactify(y){const lo=-.62,hi=1.78,r=.88;
+   if(y<lo)return lo-r*(1-Math.exp((y-lo)/r));
+   if(y>hi)return hi+r*(1-Math.exp(-(y-hi)/r));
+   return y;
+ }
+ function outerMap(x,y,a=1){const p=F(x,y,a);return {x:p.x,y:compactify(p.y)}}
+ function interpolateMap(x,y,t){
+   t=clamp(t,0,1);
+   if(t<=.48){const q=outerMap(x,y,0),u=ease(t/.48);
+     return {x:x+(q.x-x)*u,y:y+(q.y-y)*u};}
+   return outerMap(x,y,ease((t-.48)/.52));
+ }
+ function trajectoryAtY(y){
+   let a={x:0,y},b={x:1,y},left=[a],right=[b];
+   for(let k=1;k<=5;k++){a=outerMap(a.x,a.y,1);b=outerMap(b.x,b.y,1);left.push(a);right.push(b)}
+   return [left,right];
+ }
+ function refinedY(){
+   // Refinamiento adaptativo para mantener curvas suaves incluso en h^5(D).
+   const starts=[];for(let j=0;j<=820;j++)starts.push(j/820);
+   for(let w of wordsOfLength(5)){
+     const [a,b]=bandInterval(w);
+     for(let j=0;j<=18;j++)starts.push(a+(b-a)*j/18);
+   }
+   starts.sort((a,b)=>a-b);
+   const seed=starts.filter((y,i)=>i===0||y-starts[i-1]>1e-11);
+   const sampled=[seed[0]];let previous=trajectoryAtY(seed[0]);
+   function subdivide(lo,hi,a,b,depth){
+     const mid=(lo+hi)/2,m=trajectoryAtY(mid);
+     let err=0;
+     for(let k=1;k<=5;k++)for(let x=0;x<2;x++){
+       const p=a[x][k],q=b[x][k],r=m[x][k];
+       err=Math.max(err,Math.hypot(r.x-(p.x+q.x)/2,r.y-(p.y+q.y)/2));
+     }
+     if(err>.0014&&depth<12&&hi-lo>1e-10){
+       subdivide(lo,mid,a,m,depth+1);
+       subdivide(mid,hi,m,b,depth+1);
+     }else sampled.push(hi);
+   }
+   for(let j=1;j<seed.length;j++){
+     const next=trajectoryAtY(seed[j]);subdivide(seed[j-1],seed[j],previous,next,0);previous=next;
+   }
+   return sampled;
+ }
+ function makeIterPaths(){
+   const ys=refinedY(),paths=[];
+   const outline=[];
+   for(let y of ys)outline.push({x:0,y});
+   for(let j=1;j<=72;j++)outline.push({x:j/72,y:1});
+   for(let j=ys.length-1;j>=0;j--)outline.push({x:1,y:ys[j]});
+   for(let j=71;j>=0;j--)outline.push({x:j/72,y:0});
+   paths.push({type:'outline',points:outline});
+   const reduced=ys.filter((_,i)=>i%2===0||i===ys.length-1);
+   for(let j=1;j<=7;j++)paths.push({type:'v',points:reduced.map(y=>({x:j/8,y}))});
+   for(let j=1;j<=11;j++)paths.push({type:'h',points:Array.from({length:73},(_,i)=>({x:i/72,y:j/12}))});
+   return paths;
+ }
+ function rebuildIterCache(){
+   const paths=makeIterPaths();state.iterCache=[paths.map(p=>p.points)];
+   for(let r=1;r<=5;r++){
+     state.iterCache.push(state.iterCache[r-1].map(path=>path.map(p=>outerMap(p.x,p.y,1))));
+   }
+   state.needsDraw=true;
+ }
+ function iterNotation(n){return n===0?'D':n===1?'h(D)':`h^${n}(D)`}
+ function updateIteration(){
+   const complete=state.iterRound>=state.iterMax;
+   $('iterRoundLabel').textContent=iterNotation(state.iterRound);
+   $('iterN').value=state.iterRound;$('iterN').max=state.iterMax;
+   $('iterMaxVal').textContent=state.iterMax;
+   $('iterScrub').value=Math.round(state.iterT*100);
+   $('iterScrub').disabled=complete;
+   $('iterScrubVal').textContent=Math.round(state.iterT*100)+' %';
+   $('iterPlay').textContent=state.iterPlaying?'Ⅱ  Pausar': '▶  Reproducir las iteraciones';
+   const phase=complete||state.iterT<.03?0:state.iterT<.49?1:2;
+   for(let i=0;i<3;i++)$('iterPhase'+i).classList.toggle('on',i===phase);
+   let label=complete?'Última imagen completa':phase===0?'Aplicar h otra vez':phase===1?'Contraer y estirar':'Doblar';
+   $('phaseBadge').textContent=complete?`${state.iterMax} ITERACIONES`:`ITERACIÓN ${state.iterRound+1} / ${state.iterMax}`;
+   $('vizTitle').textContent=`${iterNotation(state.iterRound)} ${complete?'': '→ '+iterNotation(state.iterRound+1)}`;
+   $('vizSubtitle').textContent=`${label} · Cada nueva deformación se aplica a la figura anterior, no al cuadrado original.`;
+   $('conceptIndex').textContent='ITERACIONES GEOMÉTRICAS · 02';
+   $('explainTitle').textContent=complete?'Cinco imágenes sucesivas.':'La misma transformación, una y otra vez.';
+   $('explainBody').textContent=complete?
+      `Terminamos en ${iterNotation(state.iterRound)}. Puedes retroceder y mirar cómo cada etapa de estiramiento y plegamiento actúa sobre la figura previamente deformada.`:
+      `Ahora partimos de ${iterNotation(state.iterRound)}. En lugar de reiniciar con D, cada punto de esta imagen vuelve a deformarse mediante el mismo proceso: contraer, estirar y doblar.`;
+   $('keyTitle').textContent='Qué se está iterando';
+   $('keyText').textContent=complete?'La imagen de toda la región ha sido transformada repetidamente.':
+      `${iterNotation(state.iterRound)} se convierte en ${iterNotation(state.iterRound+1)}.`;
+   $('formula').textContent=complete?iterNotation(state.iterRound):`${iterNotation(state.iterRound+1)} = h(${iterNotation(state.iterRound)})`;
+   $('mathText').textContent='La herradura local está definida inicialmente en Q. Para mostrar la imagen completa fuera de Q usamos una extensión visual indicada en esta aplicación; las bandas de retorno en Q se estudian por separado. Esta extensión coincide con h en Q, pero no representa necesariamente una herradura global canónica.';
+   state.needsDraw=true;
+ }
+ function stopIter(){state.iterPlaying=false;state.iterOne=false;updateIteration()}
+ function startIter(one=false){
+   if(state.iterRound>=state.iterMax){state.iterRound=0;state.iterT=0;}
+   state.iterPlaying=true;state.iterOne=one;state.iterTime=0;updateIteration();
+ }
+ function renderIteration(){
+   if(!state.iterCache)rebuildIterCache();
+   const r=state.iterRound,t=state.iterT,src=state.iterCache[r];
+   const paths=(r===state.iterMax||t===0)?src:src.map(path=>path.map(p=>interpolateMap(p.x,p.y,t)));
+   const boundary=paths[0];
+   if(state.iterView==='focus'){setCamera(.5,.5,2.17)}
+   else{
+     let xMin=0,xMax=1,yMin=0,yMax=1;
+     for(let k=0;k<boundary.length;k+=5){const p=boundary[k];if(p.x<xMin)xMin=p.x;if(p.x>xMax)xMax=p.x;if(p.y<yMin)yMin=p.y;if(p.y>yMax)yMax=p.y}
+     const centerX=(xMin+xMax)/2,centerY=(yMin+yMax)/2;
+     const height=Math.max(1.7,(xMax-xMin)*1.36,(yMax-yMin)*1.35*cssH/cssW);
+     setCamera(centerX,centerY,height);
+   }
+   baseGrid();drawQ(true);
+   if(state.iterGhost){const ghost=r===state.iterMax||t<.001?(r>0?state.iterCache[r-1][0]:null):src[0];if(ghost){ctx.save();ctx.setLineDash([6,5]);pathPolygon(ghost);ctx.strokeStyle='rgba(224,113,73,.52)';ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);ctx.restore()}}
+   // Colorear la imagen total (no solo los puntos que permanecen en Q).
+   pathPolygon(boundary);ctx.fillStyle='rgba(34,156,158,.27)';ctx.fill('evenodd');ctx.strokeStyle='#087a86';ctx.lineWidth=2.5;ctx.stroke();
+   if(state.iterMesh){for(let i=1;i<paths.length;i++)lineWorld(paths[i],i<9?'rgba(17,112,135,.55)':'rgba(18,117,125,.4)',1.05)}
+   // Sobreponer Q para reconocer la región de retorno y las partes que escapan.
+   if(state.showQ){rectWorld(0,0,1,1,null,'#c39839',2.1)}
+ }
+
+ function phi(z,c){return c==='0'?(z-state.bottom)/length():1-(z-state.bottom)/length()}
+ function bandInterval(word){let a=0,b=1;for(let i=word.length-1;i>=0;i--){const x=phi(a,word[i]),y=phi(b,word[i]);a=Math.min(x,y);b=Math.max(x,y)}return [a,b]}
+ function wordsOfLength(n){let out=[''];for(let k=0;k<n;k++){let next=[];for(const s of out){next.push(s+'0');next.push(s+'1')}out=next}return out}
+ function drawBands(){cameraStatic();baseGrid();rectWorld(0,0,1,1,'#ffffff','#91aebd',2.3);
+  if(state.guides){for(let s of ['0','1']){const [lo,hi]=bandInterval(s);rectWorld(0,lo,1,hi,'rgba(117,171,185,.07)',null)}}
+  const all=wordsOfLength(state.n);for(let i=0;i<all.length;i++){let s=all[i];const [lo,hi]=bandInterval(s),selected=(s===state.selected);const fill=selected?'rgba(216,109,66,.63)':(i%2?'rgba(49,137,174,.42)':'rgba(16,150,146,.39)');rectWorld(0,lo,1,hi,fill,selected?'#ba542e':'#498f98',selected?2.0:.6);
+  if(state.words&&state.n<=5){const h=(hi-lo)*cam.s;if(h>=13)label(s,.5,(lo+hi)/2,selected?'#733a20':'#1a5261',`800 ${Math.min(17,Math.max(10,h*.55))}px ui-monospace,monospace`)}}
+  rectWorld(0,0,1,1,null,'#799eaf',2.3);label('Q',-.08,1.04,'#698391','800 14px system-ui');
+  // External markers for y-axis and zero/one choice.
+  label('0',-.052,bandInterval('0').reduce((a,b)=>a+b)/2,'#206c9f','800 12px system-ui');
+  label('1',-.052,bandInterval('1').reduce((a,b)=>a+b)/2,'#bb6847','800 12px system-ui');
+  const p=projection(.5,.5);ctx.fillStyle='#63808b';ctx.textAlign='center';ctx.font='12px system-ui';ctx.fillText(`S${state.n} = {p ∈ Q : F^k(p) ∈ Q, 0 ≤ k ≤ ${state.n}}`,cssW/2,cssH-19)}
+ function periodic(word){const p=word.length;let y=0.5;for(let k=220;k>=0;k--)y=phi(y,word[k%p]);let x=.5;const images=[];for(let k=0;k<300*p;k++){let symbol=word[k%p];x=(symbol==='0'?.25:.75)+(symbol==='0'?1:-1)*state.width*(x-.5)}
+ const out=[];for(let k=0;k<p;k++){let yy=.5;for(let j=220;j>=0;j--) yy=phi(yy,word[(k+j)%p]);out.push({x,y:yy,sym:word[k]});let s=word[k],xnext=(s==='0'?.25:.75)+(s==='0'?1:-1)*state.width*(x-.5);x=xnext;}return out}
+ function dotWorld(x,y,color,r=6,outline='#fff'){let p=projection(x,y);ctx.beginPath();ctx.arc(p.x,p.y,r,0,TWO);ctx.fillStyle=color;ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=outline;ctx.stroke()}
+ function drawOrbits(){cameraStatic();baseGrid();drawQ(false);const [lo0,hi0]=bandInterval('0'),[lo1,hi1]=bandInterval('1');rectWorld(0,lo0,1,hi0,'rgba(37,108,190,.12)');rectWorld(0,lo1,1,hi1,'rgba(216,109,66,.12)');
+ const pts=state.periodicPoints;if(!pts.length)return;
+ for(let j=0;j<pts.length;j++){let a=pts[j],b=pts[(j+1)%pts.length];const pa=projection(a.x,a.y),pb=projection(b.x,b.y);ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);ctx.strokeStyle='rgba(42,110,130,.35)';ctx.lineWidth=2;ctx.stroke()}
+ for(let j=0;j<pts.length;j++){let c=pts[j];dotWorld(c.x,c.y,'#8ca8af',4.5);let p=projection(c.x,c.y);ctx.fillStyle='#66818b';ctx.font='700 12px system-ui';ctx.textAlign='left';ctx.fillText(`p${j}`,p.x+10,p.y-9)}
+ let current=pts[state.orbitStep%pts.length],currentSymbol=current.sym;dotWorld(current.x,current.y,'#dc7746',9);let q=projection(current.x,current.y);ctx.beginPath();ctx.arc(q.x,q.y,17,0,TWO);ctx.strokeStyle='rgba(216,109,66,.34)';ctx.lineWidth=3;ctx.stroke();
+ label('0',-.065,(lo0+hi0)/2,'#2779b1','800 16px system-ui');label('1',-.065,(lo1+hi1)/2,'#c76b44','800 16px system-ui');
+ ctx.fillStyle='#456777';ctx.font='600 13px system-ui';ctx.textAlign='center';ctx.fillText(`Símbolo actual: ${currentSymbol}     ·     Iteración: ${state.orbitStep}`,cssW/2,cssH-19)}
+ function draw(){state.needsDraw=false;ctx.clearRect(0,0,cssW,cssH);switch(state.mode){case'geometry':drawGeometry();break;case'iterate':renderIteration();break;case'bands':drawBands();break;case'orbits':drawOrbits();break}}
+ function resize(){let r=canvas.getBoundingClientRect(),newW=Math.max(300,r.width),newH=Math.max(260,r.height),newDpr=Math.min(2,window.devicePixelRatio||1);cssW=newW;cssH=newH;dpr=newDpr;canvas.width=Math.round(cssW*dpr);canvas.height=Math.round(cssH*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);state.needsDraw=true}
+ function updateGeom(){const stage=state.stage,idx=stage>=2.75?3:stage>=1.5?2:stage>=.55?1:0;
+ const concepts=[
+ ['OBSERVA · 01','Empezamos con un cuadrado.','Cada punto tiene una imagen determinada por una regla matemática.','¿Qué ocurre si lo deformamos sin cortarlo?','Q = [0,1]²','Un punto no se mueve al azar: la transformación fija su destino.'],
+ ['DEFORMACIÓN · 02','Contraer en una dirección, estirar en otra.','La cuadrícula se comprime transversalmente y se expande longitudinalmente: aparece una franja muy delgada y larga.','Una dirección pierde distancias; la otra las amplifica.',`λ = ${fmt(state.width)}    ·    σ ≈ ${fmt(length())}`,'λ es la escala transversal. σ es la expansión de la línea central (antes del pliegue).'],
+ ['PLEGAMIENTO · 03','Ahora doblamos la franja.','El extremo superior gira hasta que la imagen forma una U. Ningún punto tiene dos imágenes y la franja no se corta.','La forma geométrica permite que una parte regrese al cuadrado.','F(Q) ≈ herradura','La forma es una deformación continua e inyectiva de Q en el plano.'],
+ ['REGRESO · 04','La imagen atraviesa Q dos veces.','La herradura intersecta el cuadrado original en dos regiones de retorno. Los colores identifican los dos posibles retornos.','Cada regreso permite elegir entre dos alternativas: 0 o 1.','F(Q) ∩ Q = V₀ ∪ V₁','En la siguiente pestaña estudiaremos los puntos de Q que permanecen en Q al iterar.']
+ ];let v=concepts[idx];$('conceptIndex').textContent=v[0];$('explainTitle').textContent=v[1];$('explainBody').textContent=v[2];$('keyTitle').textContent=idx===3?'La conexión con símbolos':idx===0?'La pregunta':'Idea fundamental';$('keyText').textContent=v[3];$('formula').textContent=v[4];$('mathText').textContent=v[5];$('phaseBadge').textContent=`ETAPA ${idx+1} / 4`;
+ [...$('stageScale').children].forEach((el,i)=>el.classList.toggle('now',i===idx));$('stageSlider').value=Math.round(stage*100);$('stagePercent').textContent=`${Math.round(stage/3*100)} %`;
+ $('prevStage').disabled=stage<.001;$('nextStage').disabled=stage>2.999;state.needsDraw=true}
+ function updateBands(){const L=length(),count=2**state.n,all=wordsOfLength(state.n);if(!all.includes(state.selected))state.selected=all[0];const [a,b]=bandInterval(state.selected);
+ $('nVal').textContent=`n = ${state.n}`;$('nSlider').value=state.n;$('moreN').disabled=state.n>=8;$('lessN').disabled=state.n<=1;$('bandsWidth').textContent=fmt(state.width);$('bandsStretch').textContent=fmt(L);
+ $('phaseBadge').textContent=`${count} BANDAS`;$('explainTitle').textContent=`Después de ${state.n} iteración${state.n===1?'':'es'}: ${count} bandas.`;
+ $('conceptIndex').textContent='ITINERARIOS · 02';$('explainBody').textContent='Se colorean los puntos que permanecen dentro de Q durante los primeros n pasos. Cada paso conserva dos alternativas y subdivide las bandas anteriores. Ahora puedes explorar hasta 8 iteraciones; para la charla, 5 ofrece una visualización clara.';
+ $('keyTitle').textContent='Palabra seleccionada';$('keyText').innerHTML=`<span class="word">${state.selected}</span><br><span class="coordinates">y ∈ [${fmt(a,6)}, ${fmt(b,6)}]</span>`;
+ $('formula').innerHTML=`2<sup>${state.n}</sup> = ${count} bandas`;$('mathText').textContent=`Cada banda tiene altura σ⁻ⁿ ≈ ${fmt(Math.pow(L,-state.n),6)}. Las etiquetas 0 y 1 indican por qué rama pasa la órbita en cada paso.`;
+ $('vizTitle').textContent='De las dos bandas a las palabras binarias';$('vizSubtitle').textContent='Haz clic en una franja para seleccionar su itinerario.';state.needsDraw=true}
+ function updateOrbits(){state.periodicPoints=periodic(state.word);let p=state.periodicPoints[state.orbitStep%state.periodicPoints.length];$('phaseBadge').textContent=`PERÍODO ${state.word.length}`;$('conceptIndex').textContent='DINÁMICA SIMBÓLICA · 03';$('explainTitle').textContent='Una órbita, una sucesión de símbolos.';
+ $('explainBody').textContent='Los puntos mostrados son periódicos: después de tantos pasos como símbolos tenga la palabra, regresan a su posición inicial.';
+ $('keyTitle').textContent='Itinerario periódico';$('keyText').innerHTML=`<span class="word">(${state.word})∞</span><br><span class="coordinates">p = (${fmt(p.x,5)}, ${fmt(p.y,5)})</span>`;
+ $('formula').textContent=`F${state.word.length===1?'':'^'+state.word.length}(p) = p`;$('mathText').textContent=`En el paso ${state.orbitStep}, el símbolo es ${p.sym}. La banda 0 se envía a la franja vertical izquierda, mientras que la banda 1 se envía a la derecha. Cada palabra periódica determina un ciclo en este modelo.`;
+ $('vizTitle').textContent='Órbitas periódicas dentro de Q';$('vizSubtitle').textContent='Cada punto permanece en Q en todos sus pasos.';state.needsDraw=true}
+ function setMode(mode){state.playingGeom=false;state.orbitPlay=false;state.iterPlaying=false;state.iterOne=false;$('playGeom').textContent='▶  Reproducir construcción';$('playOrbit').textContent='▶  Reproducir órbita';state.mode=mode;for(let t of document.querySelectorAll('.tab'))t.classList.toggle('active',t.dataset.mode===mode);
+ for(let m of ['geometry','iterate','bands','orbits'])$(m+'Controls').classList.toggle('no-display',m!==mode);$('geomTimeline').classList.toggle('no-display',mode!=='geometry');$('iterTimeline').classList.toggle('no-display',mode!=='iterate');$('stageScale').classList.toggle('no-display',mode!=='geometry');$('gridToggle').disabled=false;
+ $('canvasHint').textContent=mode==='iterate'?'hⁿ(D) = h(hⁿ⁻¹(D))':mode==='bands'?'Sₙ = ∩ F⁻ᵏ(Q)':mode==='orbits'?'p, F(p), F²(p), …':'Q = [0,1] × [0,1]';$('legend').innerHTML=mode==='iterate'?'<span><i class="dot" style="background:#148d91"></i>Imagen actual hⁿ(D)</span><span><i class="dot" style="background:#d86d42"></i>Figura de entrada</span><span><i class="dot" style="background:#f7c76b"></i>Región Q</span>':mode==='bands'?'<span><i class="dot" style="background:#319db1"></i>Bandas supervivientes</span><span><i class="dot" style="background:#d86d42"></i>Palabra seleccionada</span>':mode==='orbits'?'<span><i class="dot" style="background:#dc7746"></i>Posición actual</span><span><i class="dot" style="background:#92a9b0"></i>Otras posiciones del ciclo</span>':'<span><i class="dot" style="background:#148d91"></i>Imagen deformada F(Q)</span><span><i class="dot" style="background:#f7c76b;border:1px solid #a47d27"></i>Cuadrado original Q</span>';
+ $('sidebarFoot').textContent=mode==='iterate'?'Se transforma la figura completa en cada paso. Fuera de Q se elige una extensión suave, cuya elección influye en las partes que escapan.':mode==='geometry'?'El cuadrado se transforma en una franja larga, delgada y plegada. La vista está orientada horizontalmente para facilitar la proyección en diapositivas.':mode==='bands'?'Solo contamos órbitas mientras permanecen en Q; la regla local F no está definida aquí fuera del cuadrado.':'La sucesión es bilateral en la herradura completa; el itinerario futuro se observa en las bandas horizontales.';
+ if(mode==='geometry'){$('vizTitle').textContent='Del cuadrado a la herradura';$('vizSubtitle').textContent='Una transformación continua, mostrada paso a paso.';updateGeom()}else if(mode==='iterate'){updateIteration()}else if(mode==='bands')updateBands();else updateOrbits();resize()}
+ function setStage(x){state.stage=clamp(x,0,3);updateGeom()}
+ function stopGeom(){state.playingGeom=false;$('playGeom').textContent='▶  Reproducir construcción'}
+ function startGeom(){if(state.stage>=2.99)setStage(0);state.playingGeom=true;state.geomStart=performance.now()-state.stage/3*9200;$('playGeom').textContent='Ⅱ  Pausar construcción'}
+ function setN(n){state.n=clamp(n,1,8);updateBands()}
+ function nextOrbit(){state.orbitStep++;updateOrbits()}
+ function toggleOrbit(){state.orbitPlay=!state.orbitPlay;$('playOrbit').textContent=state.orbitPlay?'Ⅱ  Pausar órbita':'▶  Reproducir órbita';state.orbitLast=0}
+ function frame(time){if(state.mode==='iterate'&&state.iterPlaying){
+   if(!state.iterTime)state.iterTime=time;let dt=Math.min(.075,(time-state.iterTime)/1000);state.iterTime=time;
+   state.iterT+=dt/4.6;if(state.iterT>=1){state.iterT=0;state.iterRound++;if(state.iterOne||state.iterRound>=state.iterMax){state.iterPlaying=false;state.iterOne=false;}}
+   updateIteration();
+ }
+ if(state.mode==='geometry'&&state.playingGeom){let elapsed=(time-state.geomStart)/9200,progress=clamp(elapsed,0,1);let st;
+ // Holds distinguish the stages while keeping a continuous geometric deformation.
+ if(progress<.08)st=0;else if(progress<.38)st=(progress-.08)/.30;else if(progress<.45)st=1;else if(progress<.80)st=1+(progress-.45)/.35;else if(progress<.89)st=2;else st=2+(progress-.89)/.11;
+ setStage(st);if(progress>=1)stopGeom()}
+ if(state.mode==='orbits'&&state.orbitPlay){if(!state.orbitLast)state.orbitLast=time;if(time-state.orbitLast>=1100){nextOrbit();state.orbitLast=time}}
+ if(state.needsDraw)draw();requestAnimationFrame(frame)}
+ for(let t of document.querySelectorAll('.tab'))t.addEventListener('click',()=>setMode(t.dataset.mode));
+ $('playGeom').addEventListener('click',()=>state.playingGeom?stopGeom():startGeom());$('prevStage').addEventListener('click',()=>{stopGeom();setStage(Math.ceil(state.stage-.0001)-1)});$('nextStage').addEventListener('click',()=>{stopGeom();setStage(Math.floor(state.stage+.0001)+1)});$('rewindBtn').addEventListener('click',()=>{stopGeom();setStage(0)});$('stageSlider').addEventListener('input',e=>{stopGeom();setStage(+e.target.value/100)});
+ $('widthSlider').addEventListener('input',e=>{state.width=+e.target.value;$('widthVal').textContent=fmt(state.width);state.needsDraw=true;state.iterCache=null;if(state.mode==='iterate')updateIteration();if(state.mode==='bands')updateBands();if(state.mode==='orbits')updateOrbits();if(state.mode==='geometry')updateGeom()});
+ $('heightSlider').addEventListener('input',e=>{state.top=+e.target.value;$('heightVal').textContent=fmt(state.top);state.needsDraw=true;state.iterCache=null;if(state.mode==='iterate')updateIteration();if(state.mode==='bands')updateBands();if(state.mode==='orbits')updateOrbits();if(state.mode==='geometry')updateGeom()});
+ $('gridToggle').addEventListener('change',e=>{state.grid=e.target.checked;state.needsDraw=true});$('qToggle').addEventListener('change',e=>{state.showQ=e.target.checked;state.needsDraw=true});
+ $('nSlider').addEventListener('input',e=>setN(+e.target.value));$('lessN').addEventListener('click',()=>setN(state.n-1));$('moreN').addEventListener('click',()=>setN(state.n+1));$('wordsToggle').addEventListener('change',e=>{state.words=e.target.checked;state.needsDraw=true});$('bandGuide').addEventListener('change',e=>{state.guides=e.target.checked;state.needsDraw=true});
+ $('iterPlay').addEventListener('click',()=>state.iterPlaying?stopIter():startIter());
+ $('iterOnce').addEventListener('click',()=>{stopIter();startIter(true)});
+ $('iterReset').addEventListener('click',()=>{stopIter();state.iterRound=0;state.iterT=0;updateIteration()});
+ $('iterN').addEventListener('input',e=>{const n=+e.target.value;stopIter();state.iterRound=n;state.iterT=0;updateIteration()});
+ $('iterMax').addEventListener('input',e=>{const m=+e.target.value;stopIter();state.iterMax=m;state.iterRound=Math.min(state.iterRound,state.iterMax);state.iterT=0;updateIteration()});
+ $('iterScrub').addEventListener('input',e=>{const t=(+e.target.value)/100;stopIter();state.iterT=t;updateIteration()});
+ $('iterView').addEventListener('change',e=>{state.iterView=e.target.value;state.needsDraw=true});
+ $('iterGhost').addEventListener('change',e=>{state.iterGhost=e.target.checked;state.needsDraw=true});
+ $('iterMesh').addEventListener('change',e=>{state.iterMesh=e.target.checked;state.needsDraw=true});
+ $('orbitSelect').addEventListener('change' ,e=>{state.word=e.target.value;state.orbitStep=0;state.orbitPlay=false;$('playOrbit').textContent='▶  Reproducir órbita';updateOrbits()});$('playOrbit').addEventListener('click',toggleOrbit);$('stepOrbit').addEventListener('click',()=>{state.orbitPlay=false;$('playOrbit').textContent='▶  Reproducir órbita';nextOrbit()});$('resetOrbit').addEventListener('click',()=>{state.orbitPlay=false;state.orbitStep=0;$('playOrbit').textContent='▶  Reproducir órbita';updateOrbits()});
+ canvas.addEventListener('click',e=>{if(state.mode!=='bands')return;let bounds=canvas.getBoundingClientRect(),py=(e.clientY-bounds.top),worldY=state.horizontal?cam.y+(e.clientX-bounds.left-cssW/2)/cam.s:cam.y+(cssH/2-py)/cam.s,all=wordsOfLength(state.n);for(let s of all){let [a,b]=bandInterval(s);if(worldY>=a&&worldY<=b){state.selected=s;updateBands();return}}});
+ $('presentBtn').addEventListener('click',async()=>{const isFull=!!document.fullscreenElement;if(isFull){try{await document.exitFullscreen()}catch(_){ }document.body.classList.remove('presentation')}else{try{await document.documentElement.requestFullscreen()}catch(_){document.body.classList.add('presentation')}}setTimeout(resize,150)});
+ document.addEventListener('fullscreenchange',()=>{document.body.classList.toggle('presentation',!!document.fullscreenElement);setTimeout(resize,140)});
+ document.addEventListener('keydown',e=>{if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;if(e.key==='f'||e.key==='F'){$('presentBtn').click();e.preventDefault()}else if(e.key===' '){e.preventDefault();if(state.mode==='geometry')$('playGeom').click();if(state.mode==='iterate')$('iterPlay').click();if(state.mode==='orbits')toggleOrbit()}else if(e.key==='ArrowRight'){e.preventDefault();if(state.mode==='geometry'){$('nextStage').click()}if(state.mode==='iterate'){stopIter();state.iterRound=Math.min(state.iterMax,state.iterRound+1);state.iterT=0;updateIteration()}if(state.mode==='bands')setN(state.n+1);if(state.mode==='orbits')nextOrbit()}else if(e.key==='ArrowLeft'){e.preventDefault();if(state.mode==='geometry')$('prevStage').click();if(state.mode==='iterate'){stopIter();state.iterRound=Math.max(0,state.iterRound-1);state.iterT=0;updateIteration()}if(state.mode==='bands')setN(state.n-1);if(state.mode==='orbits'){state.orbitStep=Math.max(0,state.orbitStep-1);updateOrbits()}}});
+ window.addEventListener('resize',resize);if(window.ResizeObserver)new ResizeObserver(resize).observe(canvas);
+ setMode('iterate');updateIteration();requestAnimationFrame(frame);
+ // API mínima de inspección para comprobar numéricamente el modelo.
+ window.HerraduraDebug={F:(x,y)=>F(x,y,1),outerMap,interpolateMap,phi,bandInterval,periodic:word=>periodic(word),iterState:()=>({round:state.iterRound,t:state.iterT,max:state.iterMax,cacheDepth:state.iterCache?.length||0}),getParams:()=>({width:state.width,top:state.top,bottom:state.bottom,expansion:length()})};
+})();
+</script>
+</body>
+</html>
