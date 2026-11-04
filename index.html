@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1323">
+<title>Laboratorio del caos · Péndulo simple y doble</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #08101c; --panel: #111e30; --panel2: #0d192a; --line: #293b50;
+    --text: #eaf1f8; --muted: #91a5bc; --blue: #61b4ff; --orange: #ff9b66;
+    --mint: #81dfc2; --shadow: 0 18px 48px rgba(0,0,0,.15);
+  }
+  * {box-sizing:border-box}
+  html,body {margin:0; min-height:100%;font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+  body {background:radial-gradient(ellipse 90% 62% at 67% -9%,#183252 0%,transparent 68%),var(--bg)}
+  button,input,select {font:inherit}
+  button {cursor:pointer}
+  button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+  .shell{max-width:1570px;margin:auto;padding:24px clamp(14px,2.6vw,42px) 30px}
+  header {display:flex;gap:22px;align-items:flex-end;justify-content:space-between; margin-bottom:24px; flex-wrap:wrap}
+  .eyebrow{font-size:11px;letter-spacing:.19em;text-transform:uppercase;font-weight:780;color:var(--mint);margin-bottom:9px}
+  h1 {font-size:clamp(25px,3.1vw,43px);line-height:1.12;letter-spacing:-.035em;font-weight:760;margin:0 0 9px}
+  header p {max-width:720px;color:var(--muted);margin:0;font-size:14px;line-height:1.5}
+  .header-pill{padding:10px 14px;border:1px solid var(--line);border-radius:30px;color:#bdd0e3;font-size:12px;white-space:nowrap;background:rgba(19,34,52,.7)}
+  .layout{display:grid;grid-template-columns:302px minmax(0,1fr);gap:16px;align-items:start}
+  .sidebar, .display{border:1px solid var(--line);background:linear-gradient(150deg,#132136 0%,#0d1929 90%);border-radius:18px;box-shadow:var(--shadow)}
+  .sidebar{padding:19px 19px 16px}
+  .sidehead{display:flex;gap:9px;align-items:center;font-weight:700;font-size:15px;margin-bottom:5px}
+  .sidehead .shape{width:17px;height:17px;border:1px solid var(--mint);border-radius:5px;display:grid;place-items:center;color:var(--mint);font-size:12px}
+  .aside-intro{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 15px}
+  .group-title{font-size:11px;color:#a4b9cd;letter-spacing:.09em;text-transform:uppercase;font-weight:790;display:flex;align-items:center;gap:7px;margin:20px 0 10px}
+  .group-title:after{content:"";height:1px;flex:1;background:var(--line)}
+  .control{margin-bottom:18px}
+  .control label{display:flex;justify-content:space-between;gap:10px;color:#d6e3f0;font-size:12px;margin-bottom:9px;align-items:center}
+  .control output{font-variant-numeric:tabular-nums;color:var(--text);font-weight:740;background:#22374a;padding:3px 7px;border-radius:7px;min-width:62px;text-align:right}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:#344960;border-radius:20px;outline:none;margin:2px 0;cursor:pointer;accent-color:var(--mint)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;background:var(--mint);width:15px;height:15px;border:3px solid #d9fff2;border-radius:50%;box-shadow:0 0 0 3px rgba(129,223,194,.12)}
+  input[type=range]::-moz-range-thumb{background:var(--mint);width:11px;height:11px;border:3px solid #d9fff2;border-radius:50%}
+  .range-bounds{display:flex;justify-content:space-between;font-size:10px;color:#7891a8;margin-top:5px}
+  .note{padding:11px 12px;background:#142c39;border:1px solid #2c5360;color:#bddad6;border-radius:10px;font-size:11px;line-height:1.5;margin-top:12px}
+  .presets {display:flex;gap:6px;margin:15px 0 3px;flex-wrap:wrap}
+  .ghost{background:transparent;color:#cfe0f1;border:1px solid #3a5169;border-radius:9px;padding:7px 10px;font-size:12px;transition:background .15s}
+  .ghost:hover{background:#253c52}
+  .display{padding:17px 19px 14px;min-width:0}
+  .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-bottom:14px}
+  .buttons{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .primary{border:1px solid #9bf0d6;background:var(--mint);color:#0d2530;font-weight:750;min-width:116px}
+  .primary:hover{background:#b0f5de}
+  .btn{border-radius:10px;padding:9px 13px;font-size:12px;white-space:nowrap;min-height:36px}
+  .time-text {font-variant-numeric:tabular-nums;font-size:23px;font-weight:760;letter-spacing:-.04em}
+  .time-text small{font-size:13px;color:var(--muted);font-weight:450;letter-spacing:0}
+  select{background:#20344a;border:1px solid #3b5167;color:#e7f1fa;border-radius:8px;padding:8px 9px;font-size:12px;cursor:pointer}
+  .legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:12px;color:#b4c5d7;margin:5px 0 14px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+  .dot.ref{background:var(--blue)}.dot.pert{background:var(--orange)}
+  .pendulum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pendulum-card{border-radius:14px;border:1px solid #30445b;background:radial-gradient(ellipse at 50% 8%,#1c334c,#0a1829 72%);padding:14px 13px 10px;min-width:0}
+  .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:9px}
+  .card-name{font-size:16px;font-weight:740;letter-spacing:-.02em}
+  .card-sub{color:var(--muted);font-size:11px;margin-top:4px}
+  .model-pill{font-size:10px;color:#9bb7ce;border:1px solid #35516c;border-radius:30px;padding:5px 8px;white-space:nowrap}
+  .pendulum-canvas{display:block;width:100%;height:345px;touch-action:none}
+  .card-foot{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-top:1px solid #25394b;padding-top:9px;margin-top:2px}
+  .card-foot .stat-label{font-size:11px;color:var(--muted)}
+  .card-foot .stat{font-variant-numeric:tabular-nums;font-size:18px;font-weight:780;letter-spacing:-.025em}
+  .graph-card{margin-top:12px;border:1px solid #30445b;background:#0c1a2b;border-radius:14px;padding:14px 15px 9px}
+  .graph-title{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;justify-content:space-between}
+  .graph-title strong{font-size:14px}
+  .graph-title span{color:var(--muted);font-size:11px}
+  #chart{display:block;width:100%;height:174px;touch-action:none;cursor:crosshair}
+  .scrubber{display:flex;gap:12px;align-items:center;margin-top:2px;padding:0 6px}
+  .scrubber label{font-size:11px;color:#b6c6d7;white-space:nowrap}
+  .scrubber input{flex:1}
+  .scrubber span{font-size:11px;color:#8ca3b8;min-width:29px;text-align:right}
+  .status{display:flex;align-items:center;gap:6px;color:#84bfae;font-size:10px;margin-top:12px;min-height:14px}
+  .status:before{content:"";width:6px;height:6px;background:var(--mint);border-radius:50%;display:inline-block}
+  footer{margin-top:18px;color:#9aacbf;font-size:12px;line-height:1.6;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px 20px}
+  footer strong{color:#d1e0ee;font-weight:650}
+  body:fullscreen .shell{max-width:none;padding:20px 34px}
+  @media(max-width:920px){.layout{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px}.sidebar .sidehead,.sidebar .aside-intro,.sidebar .presets,.sidebar .note{grid-column:1/-1}.sidebar .group-title{grid-column:1/-1}.pendulum-canvas{height:310px}}
+  @media(max-width:560px){.shell{padding:15px 10px}.sidebar{display:block;padding:16px}.display{padding:12px}.pendulum-grid{grid-template-columns:1fr}.pendulum-canvas{height:290px}.header-pill{display:none}.time-text{font-size:18px}.model-pill{display:none}.graph-card{padding:12px 7px}.graph-title{padding:0 8px}#chart{height:190px}}
+  @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto !important}}
+</style>
+</head>
+<body>
+<main class="shell" id="app">
+<header>
+  <div>
+    <div class="eyebrow">Laboratorio interactivo · Dinámica y caos</div>
+    <h1>Dos comienzos casi idénticos.</h1>
+    <p>Una misma ley física, condiciones iniciales apenas distintas. ¿Cuánto tardan en separarse las trayectorias?</p>
+  </div>
+  <div class="header-pill">01 / Sensibilidad a las condiciones iniciales</div>
+</header>
+<section class="layout">
+  <aside class="sidebar" aria-label="Controles de condiciones iniciales">
+    <div class="sidehead"><span class="shape">✳</span> Diseña el experimento</div>
+    <p class="aside-intro">Modifica los ángulos iniciales. En cada sistema hay dos péndulos: uno de referencia y otro ligeramente perturbado.</p>
+    <div class="group-title">Péndulo simple</div>
+    <div class="control">
+      <label for="simple-angle">Ángulo inicial θ <output id="simple-angle-out">35°</output></label>
+      <input id="simple-angle" type="range" min="-170" max="170" value="35" step="1" aria-label="Ángulo inicial del péndulo simple en grados">
+      <div class="range-bounds"><span>−170°</span><span>170°</span></div>
+    </div>
+    <div class="control">
+      <label for="simple-delta">Perturbación Δθ <output id="simple-delta-out">0,10°</output></label>
+      <input id="simple-delta" type="range" min="0.01" max="3" value="0.1" step="0.01" aria-label="Perturbación en grados del péndulo simple">
+      <div class="range-bounds"><span>0,01°</span><span>3°</span></div>
+    </div>
+    <div class="group-title">Péndulo doble</div>
+    <div class="control">
+      <label for="double-a">Primer brazo θ₁ <output id="double-a-out">120°</output></label>
+      <input id="double-a" type="range" min="-180" max="180" value="120" step="1" aria-label="Ángulo inicial del primer brazo del péndulo doble">
+      <div class="range-bounds"><span>−180°</span><span>180°</span></div>
+    </div>
+    <div class="control">
+      <label for="double-b">Segundo brazo θ₂ <output id="double-b-out">−10°</output></label>
+      <input id="double-b" type="range" min="-180" max="180" value="-10" step="1" aria-label="Ángulo inicial del segundo brazo del péndulo doble">
+      <div class="range-bounds"><span>−180°</span><span>180°</span></div>
+    </div>
+    <div class="control">
+      <label for="double-delta">Perturbación Δθ₁ <output id="double-delta-out">0,10°</output></label>
+      <input id="double-delta" type="range" min="0.01" max="3" value="0.1" step="0.01" aria-label="Perturbación en grados del primer brazo del péndulo doble">
+      <div class="range-bounds"><span>0,01°</span><span>3°</span></div>
+    </div>
+    <div class="presets"><button class="ghost" id="restore" type="button">↺ Valores originales</button><button class="ghost" id="tiny" type="button">Δθ = 0,01°</button></div>
+    <div class="note"><strong>Condiciones físicas.</strong> Ambos parten del reposo. Masa: 1 kg por cuerpo; varillas: 1 m; gravedad: 9,81 m/s²; sin rozamiento. El segundo péndulo doble cambia <em>solo</em> θ₁.</div>
+  </aside>
+  <section class="display" aria-label="Simulación y separación entre trayectorias">
+    <div class="toolbar">
+      <div class="buttons">
+        <button id="play" class="btn primary" type="button" aria-label="Reproducir o pausar animación">▶ Reproducir</button>
+        <button id="reset" class="btn ghost" type="button">↺ Reiniciar</button>
+        <label for="speed" style="font-size:12px;color:var(--muted);margin-left:4px">Velocidad</label>
+        <select id="speed" aria-label="Velocidad de reproducción"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+        <button id="fullscreen" class="btn ghost" type="button" title="Pantalla completa (también tecla F)">⛶ Presentar</button>
+      </div>
+      <div id="time-readout" class="time-text" aria-live="off">0,00 <small>/ 18 s</small></div>
+    </div>
+    <div class="legend"><span><i class="dot ref"></i>Referencia</span><span><i class="dot pert"></i>Condición perturbada</span><span style="font-size:11px;color:#8299b1">Ambos sistemas cumplen las mismas ecuaciones</span></div>
+    <div class="pendulum-grid">
+      <section class="pendulum-card">
+        <div class="card-top"><div><div class="card-name">Péndulo simple</div><div class="card-sub">Una masa · Una articulación</div></div><span class="model-pill">1 grado de libertad</span></div>
+        <canvas id="simple-view" class="pendulum-canvas" role="img" aria-label="Dos péndulos simples, azul y naranja, con condiciones iniciales próximas"></canvas>
+        <div class="card-foot"><span class="stat-label">Distancia entre masas</span><strong class="stat" id="simple-dist">0,0017 m</strong></div>
+      </section>
+      <section class="pendulum-card">
+        <div class="card-top"><div><div class="card-name">Péndulo doble</div><div class="card-sub">Dos masas · Dos articulaciones</div></div><span class="model-pill">2 grados de libertad</span></div>
+        <canvas id="double-view" class="pendulum-canvas" role="img" aria-label="Dos péndulos dobles, azul y naranja, con condiciones iniciales próximas"></canvas>
+        <div class="card-foot"><span class="stat-label">Distancia entre masas finales</span><strong class="stat" id="double-dist">0,0017 m</strong></div>
+      </section>
+    </div>
+    <div class="graph-card">
+      <div class="graph-title"><strong>¿Cuánto se separan las trayectorias?</strong><span>Distancia entre las masas finales · metros</span></div>
+      <canvas id="chart" role="img" aria-label="Gráfica de separación entre los péndulos de referencia y perturbados a lo largo de dieciocho segundos"></canvas>
+      <div class="scrubber"><label for="seek">Instante</label><input id="seek" type="range" min="0" max="18" step="0.01" value="0" aria-label="Elegir un instante entre cero y dieciocho segundos"><span>18 s</span></div>
+    </div>
+    <div class="status" id="status" role="status">Modelo listo · Integración numérica en tu navegador, sin conexión</div>
+  </section>
+</section>
+<footer><span><strong>Para reflexionar:</strong> ¿ser determinista significa ser predecible?</span><span>Modelo ideal · Integración Runge–Kutta de orden 4 · No requiere internet</span></footer>
+</main>
+<script>
+'use strict';
+// MECÁNICA: ecuaciones exactas del péndulo simple y del doble ideal.
+// Ambos péndulos dobles tienen m1=m2=L1=L2=1, g=9.81.
+// Los ángulos se miden desde la vertical hacia abajo.
+(() => {
+  const G = 9.81, DEG = Math.PI/180, TMAX = 18;
+  const DT = 1/480, SAMP_EVERY=4, SAMPLE_DT=DT*SAMP_EVERY;
+  const BLUE = '#61b4ff', ORANGE='#ff9b66';
+  const $ = id => document.getElementById(id);
+  const sliders = ['simple-angle','simple-delta','double-a','double-b','double-delta'];
+  const initialValues = {'simple-angle':35,'simple-delta':0.1,'double-a':120,'double-b':-10,'double-delta':0.1};
+  let samples = [], playing = false, t=0, lastFrame=0, speed=1, dirty=false;
+  let restartTimer=null;
+
+  const fmt = (n,k=2) => n.toLocaleString('es-CO',{minimumFractionDigits:k,maximumFractionDigits:k});
+  function rhsSimple(y) {return [y[1], -G*Math.sin(y[0])];}
+  function rhsDouble(y) {
+    const [a,b,u,v]=y, d=a-b, C=Math.cos(d), S=Math.sin(d);
+    const A=2, B=C, D=1, F1=-2*G*Math.sin(a)-v*v*S;
+    const F2=-G*Math.sin(b)+u*u*S, det=A*D-B*B;
+    return [u,v,(D*F1-B*F2)/det,(A*F2-B*F1)/det];
+  }
+  function rk4(f,y,h){
+    const k1=f(y), k2=f(y.map((v,i)=>v+h*k1[i]*.5));
+    const k3=f(y.map((v,i)=>v+h*k2[i]*.5)), k4=f(y.map((v,i)=>v+h*k3[i]));
+    return y.map((v,i)=>v+h*(k1[i]+2*k2[i]+2*k3[i]+k4[i])/6);
+  }
+  function simplePoint(y){return {x:Math.sin(y[0]),y:Math.cos(y[0])};}
+  function doublePoints(y){return [{x:Math.sin(y[0]),y:Math.cos(y[0])},{x:Math.sin(y[0])+Math.sin(y[1]),y:Math.cos(y[0])+Math.cos(y[1])}];}
+  function getSettings(){return {
+    sa:+$('simple-angle').value,sd:+$('simple-delta').value,
+    da:+$('double-a').value,db:+$('double-b').value,dd:+$('double-delta').value
+  };}
+  function buildData(){
+    const c=getSettings();
+    let s0=[c.sa*DEG,0], s1=[(c.sa+c.sd)*DEG,0];
+    let d0=[c.da*DEG,c.db*DEG,0,0], d1=[(c.da+c.dd)*DEG,c.db*DEG,0,0];
+    const data=[];
+    for(let step=0; step<=Math.round(TMAX/DT); step++){
+      if(step%SAMP_EVERY===0){
+        const p0=simplePoint(s0),p1=simplePoint(s1),q0=doublePoints(d0),q1=doublePoints(d1);
+        data.push({time:step*DT,s0:p0,s1:p1,d0:q0,d1:q1,
+          es:Math.hypot(p0.x-p1.x,p0.y-p1.y),
+          ed:Math.hypot(q0[1].x-q1[1].x,q0[1].y-q1[1].y)});
+      }
+      if(step===Math.round(TMAX/DT))break;
+      s0=rk4(rhsSimple,s0,DT);s1=rk4(rhsSimple,s1,DT);
+      d0=rk4(rhsDouble,d0,DT);d1=rk4(rhsDouble,d1,DT);
+    }
+    return data;
+  }
+  function updateLabels(){
+    for(const id of sliders){let v=+$ (id).value, decimals=id.includes('delta')?2:0;
+      $(id+'-out').textContent=fmt(v,decimals)+'°';}
+  }
+  function recompute(){
+    playing=false; updatePlay(); t=0; lastFrame=0;
+    const start=performance.now(); samples=buildData(); dirty=true;
+    $('status').textContent='Modelo actualizado · '+fmt(performance.now()-start,0)+' ms de cálculo · '+samples.length+' instantes';
+    draw();
+  }
+  function current(){return samples[Math.max(0,Math.min(samples.length-1,Math.round(t/SAMPLE_DT)))];}
+  function updatePlay(){$('play').textContent=playing?'Ⅱ Pausar':'▶ Reproducir';}
+  function setTime(next){t=Math.max(0,Math.min(TMAX,next));$('seek').value=t.toFixed(2);draw();}
+  function sizeCanvas(canvas){
+    const r=canvas.getBoundingClientRect(), dpr=Math.min(window.devicePixelRatio||1,2);
+    let w=Math.max(20,r.width),h=Math.max(20,r.height);
+    if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){
+      canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+    }
+    const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+    return {ctx,w,h};
+  }
+  function strokeChain(ctx,pts,color,linewidth,fillradius){
+    ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+    for(let j=1;j<pts.length;j++)ctx.lineTo(pts[j].x,pts[j].y);
+    ctx.lineWidth=linewidth;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=color;ctx.stroke();
+    for(let j=1;j<pts.length;j++){
+      ctx.beginPath();ctx.arc(pts[j].x,pts[j].y,fillradius,0,2*Math.PI);
+      ctx.fillStyle=color;ctx.fill();ctx.lineWidth=1.4;ctx.strokeStyle='#0b1927';ctx.stroke();
+    }
+  }
+  function drawPendulum(id,isDouble,frame){
+    const {ctx,w,h}=sizeCanvas($(id));ctx.clearRect(0,0,w,h);
+    const piv={x:w/2,y:32}, scale=Math.min((h-68)/(isDouble?2.05:1.22),(w-42)/(isDouble?4.25:2.55));
+    const pos=(pt)=>({x:piv.x+pt.x*scale,y:piv.y+pt.y*scale});
+    ctx.save();ctx.strokeStyle='rgba(135,167,196,.11)';ctx.lineWidth=1;
+    for(let x=piv.x%38;x<w;x+=38){ctx.beginPath();ctx.moveTo(x,11);ctx.lineTo(x,h-10);ctx.stroke();}
+    for(let y=piv.y%38;y<h;y+=38){ctx.beginPath();ctx.moveTo(10,y);ctx.lineTo(w-10,y);ctx.stroke();}
+    ctx.setLineDash([3,6]);ctx.strokeStyle='rgba(180,206,226,.26)';ctx.beginPath();ctx.moveTo(piv.x,20);ctx.lineTo(piv.x,h-13);ctx.stroke();ctx.setLineDash([]);
+    // Estelas del extremo libre durante los tres segundos anteriores.
+    if(isDouble){
+      const index=Math.round(t/SAMPLE_DT),from=Math.max(0,index-360);
+      for(let branch=0;branch<2;branch++){
+        const color=branch===0?BLUE:ORANGE;
+        ctx.beginPath();
+        for(let i=from;i<=index;i+=3){
+          const q=samples[i][branch===0?'d0':'d1'][1],p=pos(q);
+          if(i===from)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);
+        }
+        ctx.strokeStyle=color;ctx.globalAlpha=.28;ctx.lineWidth=1.45;ctx.stroke();ctx.globalAlpha=1;
+      }
+    }
+    const ref=isDouble?[piv,...frame.d0.map(pos)]:[piv,pos(frame.s0)];
+    const alt=isDouble?[piv,...frame.d1.map(pos)]:[piv,pos(frame.s1)];
+    strokeChain(ctx,ref,BLUE,5,7.5);
+    strokeChain(ctx,alt,ORANGE,2.6,5.7);
+    ctx.beginPath();ctx.arc(piv.x,piv.y,5,0,2*Math.PI);ctx.fillStyle='#d9e9f8';ctx.fill();
+    ctx.fillStyle='#8095aa';ctx.font='11px system-ui,sans-serif';
+    ctx.textAlign='left';ctx.fillText(isDouble?'L₁ = L₂ = 1 m':'L = 1 m',11,h-10);
+    ctx.restore();
+  }
+  function drawChart(frame){
+    const {ctx,w,h}=sizeCanvas($('chart'));
+    const left=46,right=13,top=12,bottom=25;
+    const plotW=w-left-right,plotH=h-top-bottom;
+    const tx=tval=>left+plotW*tval/TMAX;
+    const ty=meters=>top+plotH*(1-meters/4.05);
+    ctx.clearRect(0,0,w,h);
+    ctx.font='11px system-ui,sans-serif';ctx.textBaseline='middle';
+    for(let y=0;y<=4;y++){
+      const py=ty(y);ctx.beginPath();ctx.moveTo(left,py);ctx.lineTo(w-right,py);
+      ctx.strokeStyle='rgba(171,200,224,.13)';ctx.lineWidth=1;ctx.stroke();
+      ctx.textAlign='right';ctx.fillStyle='#98acc1';ctx.fillText(y.toString(),left-9,py);
+    }
+    ctx.textBaseline='top';ctx.textAlign='center';
+    for(let x=0;x<=18;x+=3){ctx.fillStyle='#98acc1';ctx.fillText(String(x),tx(x),h-bottom+8);}
+    for(const [key,color] of [['es',BLUE],['ed',ORANGE]]){
+      ctx.beginPath();let first=true;
+      const gap=Math.max(1,Math.round(samples.length/Math.max(150,w)));
+      for(let j=0;j<samples.length;j+=gap){const sample=samples[j];
+        if(first){ctx.moveTo(tx(sample.time),ty(sample[key]));first=false;}
+        else ctx.lineTo(tx(sample.time),ty(sample[key]));
+      }
+      const end=samples.at(-1);ctx.lineTo(tx(end.time),ty(end[key]));
+      ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+    }
+    const x=tx(t);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,h-bottom);
+    ctx.strokeStyle='rgba(241,248,255,.77)';ctx.setLineDash([5,4]);ctx.lineWidth=1;ctx.stroke();ctx.setLineDash([]);
+    for(const [key,color] of [['es',BLUE],['ed',ORANGE]]){
+      ctx.beginPath();ctx.arc(x,ty(frame[key]),4,0,2*Math.PI);
+      ctx.fillStyle=color;ctx.fill();ctx.lineWidth=1.6;ctx.strokeStyle='#0c1a2b';ctx.stroke();
+    }
+  }
+  function draw(){
+    if(!samples.length)return;
+    const frame=current();
+    drawPendulum('simple-view',false,frame);
+    drawPendulum('double-view',true,frame);
+    drawChart(frame);
+    $('simple-dist').textContent=fmt(frame.es,4)+' m';
+    $('double-dist').textContent=fmt(frame.ed,4)+' m';
+    $('time-readout').innerHTML=fmt(t,2)+' <small>/ 18 s</small>';
+    $('seek').value=t.toFixed(2);
+  }
+  function loop(timestamp){
+    if(playing){
+      if(lastFrame){t+=Math.min((timestamp-lastFrame)/1000,.08)*speed;}
+      lastFrame=timestamp;
+      if(t>=TMAX){t=TMAX;playing=false;lastFrame=0;updatePlay();}
+      draw();
+    } else lastFrame=0;
+    requestAnimationFrame(loop);
+  }
+  function setSlider(id,value){$(id).value=value;}
+  sliders.forEach(id=>$(id).addEventListener('input',()=>{
+    updateLabels();clearTimeout(restartTimer);
+    // Se recalcula al terminar de mover el deslizador o tras una pausa breve.
+    restartTimer=setTimeout(recompute,190);
+  }));
+  $('play').addEventListener('click',()=>{
+    if(!samples.length)return;
+    if(t>=TMAX-0.001)t=0;
+    playing=!playing;lastFrame=0;updatePlay();draw();
+  });
+  $('reset').addEventListener('click',()=>{playing=false;lastFrame=0;setTime(0);updatePlay();});
+  $('seek').addEventListener('input',e=>{playing=false;updatePlay();setTime(+e.target.value);});
+  $('speed').addEventListener('change',e=>{speed=+e.target.value;});
+  $('restore').addEventListener('click',()=>{for(const [id,value] of Object.entries(initialValues))setSlider(id,value);updateLabels();recompute();});
+  $('tiny').addEventListener('click',()=>{setSlider('simple-delta',.01);setSlider('double-delta',.01);updateLabels();recompute();});
+  $('fullscreen').addEventListener('click',()=>{
+    if(!document.fullscreenElement)document.documentElement.requestFullscreen?.().catch(()=>{});
+    else document.exitFullscreen?.();
+  });
+  document.addEventListener('keydown',e=>{
+    if(['INPUT','SELECT','BUTTON'].includes(document.activeElement.tagName))return;
+    if(e.code==='Space'){e.preventDefault();$('play').click();}
+    if(e.key==='KeyR'){$('reset').click();}
+    if(e.key==='KeyF'){$('fullscreen').click();}
+  });
+  $('chart').addEventListener('pointerdown',e=>{
+    const rect=$('chart').getBoundingClientRect(), left=46,right=13;
+    const tt=(e.clientX-rect.left-left)/(rect.width-left-right)*TMAX;
+    playing=false;updatePlay();setTime(tt);
+  });
+  let resizeTimer;
+  window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(draw,50);});
+  window.addEventListener('fullscreenchange',()=>setTimeout(draw,160));
+  updateLabels();recompute();requestAnimationFrame(loop);
+  // Pequeño puente de pruebas que no altera la experiencia de usuario.
+  window.__pendulumLab={settings:getSettings, snapshot:()=>({t,distSimple:current().es,distDouble:current().ed}),at:(time)=>{setTime(time);return {simple:current().es,double:current().ed};}};
+})();
+</script>
+</body>
+</html>
